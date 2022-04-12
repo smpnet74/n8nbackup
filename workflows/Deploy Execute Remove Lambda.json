@@ -1,0 +1,98 @@
+{
+  "id": 11,
+  "name": "Deploy Execute Remove Lambda",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "function": "={{$node[\"Execute Command\"].json[\"stdout\"].match(/myservice\\W\\w+\\W\\w+/)[0]}}"
+      },
+      "name": "AWS Lambda",
+      "type": "n8n-nodes-base.awsLambda",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ],
+      "credentials": {
+        "aws": {
+          "id": "7",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=cd /home/ubuntu/myService\nsls deploy"
+      },
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=cd /home/ubuntu/myService\nsls remove"
+      },
+      "name": "Execute Command1",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        920,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "AWS Lambda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AWS Lambda": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-04-02T13:40:19.160Z",
+  "updatedAt": "2022-04-02T13:40:19.160Z",
+  "settings": {},
+  "staticData": null
+}
