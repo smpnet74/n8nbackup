@@ -1,0 +1,201 @@
+{
+  "id": 6,
+  "name": "Typeform to Airtable",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "formId": "iXzQpJFf"
+      },
+      "name": "Typeform Trigger",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "typeVersion": 1,
+      "position": [
+        480,
+        300
+      ],
+      "webhookId": "a095c9ec-5f01-4b69-9ead-c32ca3da4d40",
+      "credentials": {
+        "typeformApi": {
+          "id": "1",
+          "name": "Typeform account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "name",
+              "value": "={{$node[\"Typeform Trigger\"].json[\"Hello, what's your name?\"]}}"
+            },
+            {
+              "name": "email",
+              "value": "={{$node[\"Typeform Trigger\"].json[\"Nice to meet you, [field:01FZE1HV982XFZ6NPXZB2E559F], what is your email?\"]}}"
+            },
+            {
+              "name": "description",
+              "value": "={{$node[\"Typeform Trigger\"].json[\"Please include some long text\"]}}"
+            }
+          ],
+          "number": [
+            {
+              "name": "score",
+              "value": "={{$node[\"Typeform Trigger\"].json[\"Give me a score from 1 to 10\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "application": "=appc1Ym6Y2dfLlTds",
+        "table": "tblFWscclCYHpNczU",
+        "options": {}
+      },
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 1,
+      "position": [
+        920,
+        300
+      ],
+      "credentials": {
+        "airtableApi": {
+          "id": "2",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$node[\"Set\"].json[\"score\"]}}",
+              "value2": 7
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "listId": "6244b303fdec1677fc2f7c22",
+        "name": "={{$node[\"IF\"].json[\"fields\"][\"name\"]}}",
+        "description": "=Name: {{$node[\"IF\"].json[\"fields\"][\"name\"]}}\nEmail: {{$node[\"IF\"].json[\"fields\"][\"email\"]}}\nScore: {{$node[\"IF\"].json[\"fields\"][\"score\"]}}\nDescription: {{$node[\"IF\"].json[\"fields\"][\"description\"]}}",
+        "additionalFields": {}
+      },
+      "name": "Trello",
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        160
+      ],
+      "credentials": {
+        "trelloApi": {
+          "id": "3",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        360
+      ]
+    }
+  ],
+  "connections": {
+    "Typeform Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Trello",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-03-30T18:40:21.166Z",
+  "updatedAt": "2022-03-31T16:26:25.811Z",
+  "settings": {},
+  "staticData": {
+    "node:Typeform Trigger": {}
+  }
+}
