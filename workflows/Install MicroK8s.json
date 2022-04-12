@@ -1,0 +1,191 @@
+{
+  "id": 3,
+  "name": "Install MicroK8s",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "if ! [ -x \"$(command -v microk8s)\" ]; then\n  echo 'N'\nelse\n  echo 'Y'\nfi"
+      },
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"stdout\"]}}",
+              "value2": "Y"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "sudo snap install microk8s --classic --channel=1.21"
+      },
+      "name": "Install MicroK8s",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        920,
+        360
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "workflowId": "5"
+      },
+      "name": "Install kubectl if needed",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        360
+      ],
+      "notesInFlow": false,
+      "notes": "test note 1 2 3"
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "seconds"
+      },
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        260,
+        560
+      ],
+      "webhookId": "ed0c42b5-7726-4183-9680-f3ae7f4f3318"
+    },
+    {
+      "parameters": {
+        "command": "sudo microk8s enable dns\nsudo microk8s enable storage"
+      },
+      "name": "Enable K8 DNS and Storage",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        460,
+        560
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {},
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        920,
+        160
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Install MicroK8s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Install MicroK8s": {
+      "main": [
+        [
+          {
+            "node": "Install kubectl if needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Install kubectl if needed": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Enable K8 DNS and Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-03-30T17:22:23.348Z",
+  "updatedAt": "2022-03-30T18:07:33.645Z",
+  "settings": {},
+  "staticData": null
+}
