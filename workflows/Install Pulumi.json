@@ -1,0 +1,119 @@
+{
+  "id": 2,
+  "name": "Install Pulumi",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"stdout\"]}}",
+              "value2": "Y"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=if [ -d \"/home/ubuntu/.pulumi\" ];\nthen echo \"Y\"\nelse\necho \"N\"\nfi"
+      },
+      "name": "Look for Pulumi Binary",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        180,
+        300
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "command": "curl -fsSL https://get.pulumi.com | sh"
+      },
+      "name": "Install Pulumi",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        700,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "command": "echo \"already installed\""
+      },
+      "name": "Do Nothing",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        700,
+        160
+      ]
+    }
+  ],
+  "connections": {
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Do Nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Install Pulumi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look for Pulumi Binary": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Look for Pulumi Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-03-30T17:22:12.463Z",
+  "updatedAt": "2022-04-04T19:33:36.020Z",
+  "settings": {},
+  "staticData": null
+}
